@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+
+{% block navbar_addition %}
+{%load static%}
+<link rel="stylesheet" href="{% static 'general/general.css' %}">
+<a id ="create" href="{% url 'General:create' %}" type="button" class="btn btn-dark">Create</a>
+<style>
+    #create{
+        color: #e77e51;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="row justify-content-md-center d-flex col-12">
+    {% for page_obj in page %}
+            <div class="card" style="width: 18rem;">
+                <img src="{{page_obj.image}}" class="card-img-top" alt="...">
+                <div class="card-body">
+                <h5 class="card-title">{{page_obj.name}}</h5>
+                <p class="card-text">{{page_obj.description|slice:":20"}}</p>
+                <a href="{{page_obj.link}}" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+    {% endfor %}
+</div>
+{% endblock %}
