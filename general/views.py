@@ -13,13 +13,13 @@ from django.views import generic
 from . import models
 from . import forms
 
-from ._func import get_direct_image_link
+from ._func import get_direct_image_link, get_github_profile_image
 class GeneralView(generic.TemplateView):
     template_name = "general/general.html"
     
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        paginator = Paginator(models.Posts.objects.order_by("-published_date"), per_page=3)
+        paginator = Paginator(models.Posts.objects.order_by("-published_date"), per_page=200)
         page_number = kwargs.get("page_number")
         page = paginator.get_page(page_number)
 
@@ -50,11 +50,8 @@ class CreateView(generic.CreateView):
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         Post_obj = form.save()  # Сохраняем объект
 
-        
-        obj_form = get_object_or_404(models.Posts, identifier = Post_obj.identifier)
-        print(obj_form)
-        github = get_direct_image_link(obj_form.link)
-
+        github = get_github_profile_image(Post_obj.link)
+        print(github)
         Post_obj.link_image = github
         Post_obj.save()
         return super().form_valid(form)
@@ -71,3 +68,13 @@ class CreateView(generic.CreateView):
             "name_error": "name cannot be empty" if not form_data.get("name") else "",
         })
         return super().form_invalid(form)
+
+
+class DeleteView(generic.DeleteView):
+    model = models.Posts
+    success_url = reverse_lazy('General:general', kwargs = {"page_number": 1})
+    template_name = 'general/general.html'
+
+    
+    def get_success_url(self) -> str:
+        return self.success_url
